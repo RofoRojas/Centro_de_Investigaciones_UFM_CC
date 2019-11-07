@@ -81,6 +81,7 @@ Caracteristicas_de_Operacion <- function(my_row) {
   t_dia <-as.numeric(my_row["FinDe"])
   lambda <- as.numeric(my_row["Lambda"])
   miu <- as.numeric(my_row["Miu"])
+  distribucion <- my_row["Distribucion"]
   
   
   # La probabilidad de que no haya unidades en el sistema:
@@ -99,22 +100,55 @@ Caracteristicas_de_Operacion <- function(my_row) {
   # n = #definir n
   # Pn = ((lambda/miu)^n)*P0
   
-  Caracteristicas<- c(cc, restaurante, miu, lambda, t_dia, P0, Lq, L, Wq, W, Pw)
+  Caracteristicas<- c(cc, restaurante, miu, lambda, distribucion, t_dia, P0, Lq, L, Wq, W, Pw)
   return(Caracteristicas)
 }
+
+
 
 
 # Utilizamos un apply para correrlo a travez de todas las filas
 Caracteristicas <- as_data_frame(t(apply(datos_a_usar ,1, Caracteristicas_de_Operacion)))
 # Renombramos las Columnas
-colnames(Caracteristicas) <- c("CC", "Restaurante", "Miu", "Lambda", "FinDe", "P0", "Lq", "L", "Wq", "W", "Pw")
+colnames(Caracteristicas) <- c("CC", "Restaurante", "Miu", "Lambda", "Distribucion", "FinDe", "P0", "Lq", "L", "Wq", "W", "Pw")
 # Cambiamos el tipo de datos en las columnas para proximo manejo
-Caracteristicas <- Caracteristicas %>% mutate_at(c("Miu", "Lambda", "P0","Lq", "Lq", "L", "Wq", "W", "Pw"), as.numeric) %>% 
+Caracteristicas <- Caracteristicas %>% mutate_at(c("Miu", "Lambda", "Distribucion", "P0","Lq", "Lq", "L", "Wq", "W", "Pw"), as.numeric) %>% 
   mutate_at("FinDe", as.factor)
 
 # Lo escribo a un archivo que puede ser utilizado despues
 write.csv(Caracteristicas, file = "Resultados/Caracteristicas de Operacion.csv", row.names = FALSE)
 
+Tabla_de_Probabilidades <- function(my_row) {
+  # La probabilidad de que haya n unidades en el sistema:
+  cc <- my_row["CC"]
+  restaurante <- my_row["Restaurante"]
+  t_dia <-as.numeric(my_row["FinDe"])
+  lambda <- as.numeric(my_row["Lambda"])
+  miu <- as.numeric(my_row["Miu"])
+  
+  P0 <-as.numeric(my_row["P0"])
+  
+  propabilidad <- c()
+  for (n in 0:20) {
+    n = #definir n
+    Pn = ((lambda/miu)^n)*P0
+    propabilidad <- c(propabilidad, Pn)
+  }
+  propabilidad <- c(cc, restaurante, t_dia, propabilidad)
+}
+
+Probabilidades_de_N <- as_data_frame(t(apply(Caracteristicas ,1, Tabla_de_Probabilidades)))
+
+colnames(Probabilidades_de_N) <- c("CC", "Restaurante", "FinDe", 0:20)
+
+Probabilidades_de_N <- Probabilidades_de_N %>% mutate_at(3:23, as.numeric) %>% 
+  mutate_at("FinDe", as.factor)
+
+# Lo escribo a un archivo que puede ser utilizado despues
+write.csv(Probabilidades_de_N, file = "Resultados/Probabilidades de N.csv", row.names = FALSE)                            
+                               
+                               
+                               
 
 Generador_MM1 <- function(n, miu, sd_miu, inv_lambda, sd_inv_lambda) {
   #Inicializacion de parametros
@@ -147,9 +181,15 @@ Generador_MM1 <- function(n, miu, sd_miu, inv_lambda, sd_inv_lambda) {
   return(as_data_frame(historia_restaurante))
 }
 
+
+
+
+
+
 simulaciones <- list()
 
 for(i in 1:nrow(datos_a_usar)){
+  
   
 }
 
