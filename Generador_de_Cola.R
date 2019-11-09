@@ -2,23 +2,16 @@ library(dplyr)
 
 
 
-n <- 100
-min_t_ll <-0
-max_t_ll <- 5.88333333
 
-miu <- 3.330682
-sd_miu <- 1.321530
-lambda <- 0.6180961
+Formatear <- function(variable) {
+  nueva <- period(hour=(variable%/%60), minute=(variable%%60%/%1), second=((variable%%1*60)%/%1))
+  return(nueva)
+}
 
-
-Generador_de_Cola <- function(my_row) {
-  
-  n <- as.numeric(my_row['Tiempo_Tot'])
-  n<- round(n*60, 0)
-  
+Generador_de_Cola <- function(my_row, n=60) {
   cc <- my_row["CC"]
   restaurante <- my_row["Restaurante"]
-  t_dia <-as.numeric(my_row["FinDe"])
+  t_dia <-as.factor(my_row["FinDe"])
   miu <- as.numeric(my_row['Miu'])
   inv_lambda <- as.numeric(my_row['Inv_Lambda'])
   sd_inv_lambda <- as.numeric(my_row['Sd_Inv_Lambda'])
@@ -36,28 +29,19 @@ Generador_de_Cola <- function(my_row) {
   llegadas <- c()
   for (j in 1:length(clientes_por_minuto)) {
     # Se generan horas de llegadas de forma aleatoria entre cada minuto 
-    horas <- runif(clientes_por_minuto[j], j-1, j) %>% round(2) %>% sort()
+    horas <- runif(clientes_por_minuto[j], j-1, j) %>% round(digits=2) %>% sort()
     llegadas <- c(llegadas,horas)
   }
   
   
   # for(i in 1:n) {
   for(i in 1:length(llegadas)) {
-    # e_llegadas <- min_t_ll+ runif(1)* (max_t_ll-min_t_ll)
-    # e_llegadas <- abs(rnorm(1 ,mean = inv_lambda, sd = sd_inv_lambda))
-    
     llegada <- llegadas[i]
-    e_llegadas <- llegada-ultimo_cliente[2]
+    e_llegadas <- llegada-ultimo_cliente[3]
     
-    #llegada <- ultimo_cliente[3]+ e_llegadas
-    
-    # servicio <- abs(rnorm(1, mean = miu, sd = sd_miu))
-    
-    servicio <- rexp(n = 1, rate = miu)
-    # inicio <- ifelse(llegada>ultimo_cliente[7],llegada,llegada+ abs(ultimo_cliente[6]-servicio))
+    servicio <- rexp(n = 1, rate = miu) %>% round(digits=2)
     inicio <- ifelse(llegada>ultimo_cliente[7],llegada,ultimo_cliente[7])
-    
-    cola <- inicio-llegada
+    cola <- (inicio-llegada) %>% round(2)
     
     final <- inicio + servicio
     en_sistema <- final-llegada
@@ -74,20 +58,22 @@ Generador_de_Cola <- function(my_row) {
   
   colnames(historia_restaurante) <- c("CC", "Restaurante", "FinDe","id", "Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema")
   
-  #historia_restaurante <- as_data_frame(historia_restaurante) %>% mutate_at()
+  historia_restaurante <- as_data_frame(historia_restaurante) 
+  
+  # historia_restaurante<- historia_restaurante %>%
+  #   mutate_at(c("Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema"), ~Formatear(.))
     
-  return(as_data_frame(historia_restaurante))
-}
-
-new_row <- datos_a_usar %>% filter(CC=="Miraflores", Restaurante=="McDonalds", FinDe==0)
-
-hola<- Generador_de_Cola(new_row)
-hola$Llegada <- period(hour=(hola$Llegada%/%60), minute=(hola$Llegada%%60%/%1), second=((hola$Llegada%%1*60)%/%1))
+  return(historia_restaurante)
+} 
 
 
-h<-apply(datos_a_usar, 1, Generador_MM1)
+Simulaciones <- apply(datos_a_usar, 1, Generador_de_Cola, n=120)
 
-h[[2]]%>% View()
+
+Simulaciones[[19]] %>% View()
+
+
+
 
   
   
