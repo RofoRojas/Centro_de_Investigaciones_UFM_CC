@@ -1,27 +1,21 @@
 library(dplyr)
 
-
-
-
 Formatear <- function(variable) {
   nueva <- period(hour=(variable%/%60), minute=(variable%%60%/%1), second=((variable%%1*60)%/%1))
   return(nueva)
 }
 
 Generador_de_Cola <- function(my_row, n=60) {
-  cc <- my_row["CC"]
-  restaurante <- my_row["Restaurante"]
-  t_dia <-as.factor(my_row["FinDe"])
+  cc <- my_row['CC']
+  restaurante <- my_row['Restaurante']
+  t_dia <-as.factor(my_row['FinDe'])
   miu <- as.numeric(my_row['Miu'])
-  inv_lambda <- as.numeric(my_row['Inv_Lambda'])
-  sd_inv_lambda <- as.numeric(my_row['Sd_Inv_Lambda'])
-  
   lambda <- as.numeric(my_row['Lambda'])
   
   #Inicializacion de parametros
   # Este vector consiste de 
   # Id|Tiempo Entre Llegadas|Llegadas|Servicio|Inicio|Tiempo en Cola|Tiempo en Servicio|Final|Tiempo en Sistema|
-  ultimo_cliente<- c(0,0,0,0,0,0,0,0)
+  ultimo_cliente<- c(0,0,0,miu,0,miu,miu,miu)
   historia_restaurante <- c(ultimo_cliente)
   
   
@@ -60,20 +54,18 @@ Generador_de_Cola <- function(my_row, n=60) {
   
   historia_restaurante <- as_data_frame(historia_restaurante) 
   
-  # historia_restaurante<- historia_restaurante %>%
-  #   mutate_at(c("Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema"), ~Formatear(.))
-    
+  historia_restaurante<- historia_restaurante %>%
+  mutate_at(c("Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema"), as.numeric)
+
+  historia_restaurante<- historia_restaurante %>%
+    mutate_at(c("Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema"), ~Formatear(.))
+  
   return(historia_restaurante)
 } 
 
 
-Simulaciones <- apply(datos_a_usar, 1, Generador_de_Cola, n=120)
-
+Simulaciones <- apply(datos_a_usar, 1, Generador_de_Cola, n=168)
 
 Simulaciones[[19]] %>% View()
-
-
-
-
   
   
