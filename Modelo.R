@@ -33,6 +33,21 @@ for (folder in list.files("Data")) {
         mutate(T_Llegadas=T_Llegadas/dminutes(1), T_Cola= T_Cola/dminutes(1), T_Servicio=T_Servicio/dminutes(1), T_Sistema= T_Sistema/dminutes(1),
                
                Libre= Libre/dminutes(1), Hizo_Cola=ifelse(T_Cola!=0, 1, 0))
+      # Con estos ciclos, calculo cual es el promedio de personas en el sistema y el promedio de personas en Cola
+      En_Sistema<-c(0)
+      En_Cola<-c(0)
+      for (i in 2:nrow(temp_table)) {
+        contador_s <- 0
+        contador_c<- ifelse(temp_table$T_Cola[i]>0,1,0)
+        for (j in 1:(i-1)) {
+          contador_s <- contador_s + ifelse(temp_table$Final[j]>temp_table$Llegada[i],1,0)
+          contador_c <- contador_c + ifelse(temp_table$Inicio[j]>temp_table$Llegada[i],1,0)
+        }
+        En_Sistema<- c(En_Sistema, contador_s)
+        En_Cola<- c(En_Cola, contador_c)
+      }
+      temp_table$En_Sistema<- En_Sistema
+      temp_table$En_Cola <- En_Cola
       
       
       # Se obtienen los datos mas relevantes de cada archivo y se resumen en esta tabla
@@ -44,7 +59,8 @@ for (folder in list.files("Data")) {
                   Min_T_Llegadas=min(T_Llegadas, na.rm = T), Max_T_Llegadas= max(T_Llegadas, na.rm = T), Max_T_Cola= max(T_Cola, na.rm = T),
                   # Promedios de tiempos calculados
                   T_Cola= mean(T_Cola), T_Sistema_Prom=mean(T_Sistema),
-                  T_Sistema_Total= sum(T_Sistema), Libre=sum(Libre, na.rm = T), Hizo_Cola= sum(Hizo_Cola)) %>% 
+                  T_Sistema_Total= sum(T_Sistema), Libre=sum(Libre, na.rm = T), Hizo_Cola= sum(Hizo_Cola),
+                  En_Cola= mean(En_Cola), En_Sistema= mean(En_Sistema)) %>% 
         mutate(D_Semana=wday(Fecha,week_start = 1)) %>% mutate(FinDe = ifelse(D_Semana>=6,1,0)) %>% 
         mutate(Tiempo_Tot= as.duration(Intervalo)/dhours(1)) %>% 
         mutate(Lambda= Cantidad/(Tiempo_Tot*60)) %>% 
@@ -63,8 +79,9 @@ for (folder in list.files("Data")) {
 
 
 datos_a_usar <- datos_iniciales %>%
+  # S es utilizada para marcar la diferencia de las variables con pesos
   mutate(LambdaS=(Cantidad*Lambda), MiuS=(Cantidad*Miu), Var_Miu= (Sd_Miu^2), Inv_LambdaS=(Cantidad*Inv_Lambda), 
-         Var_Inv_Lambda=(Sd_Inv_Lambda^2),
+         Var_Inv_Lambda=(Sd_Inv_Lambda^2), En_ColaS= Cantidad*En_Cola, En_SistemaS= Cantidad*En_Sistema,
          T_ColaS= Cantidad*T_Cola, T_Sistema_PromS= Cantidad*T_Sistema_Prom) %>% group_by(CC, Restaurante, FinDe) %>% 
   # Resumen de los datos relevantes por agrupacion establecida
   summarise(Cantidad = sum(Cantidad), Lambda= sum(LambdaS)/sum(Cantidad),
@@ -75,8 +92,9 @@ datos_a_usar <- datos_iniciales %>%
             T_Cola= sum(T_ColaS)/sum(Cantidad), T_Sistema_Prom = sum(T_Sistema_Prom)/sum(Cantidad),
             Tiempo_Tot=sum(Tiempo_Tot),
             # Caracteristicas de operación calculadas
-            Total_Minutos= sum(Total_Minutos), Libre = sum(Libre), P_No_Cola= 1- sum(Hizo_Cola)/sum(Cantidad)
-  ) %>% mutate(Por_Ocioso= Libre/Total_Minutos)
+            Total_Minutos= sum(Total_Minutos), Libre = sum(Libre), P_No_Cola= 1-sum(Hizo_Cola)/sum(Cantidad),
+            En_Cola=sum(En_ColaS)/sum(Cantidad), En_Sistema=sum(En_SistemaS)/sum(Cantidad)) %>% 
+  mutate(Por_Ocioso= Libre/Total_Minutos)
 
 # Para poder calcular la distribucion por cada centro comercial
 Totales <- datos_a_usar %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% group_by(CC, FinDe) %>% 
@@ -85,7 +103,7 @@ Totales <- datos_a_usar %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% group_by(
 datos_a_usar<- as_data_frame(datos_a_usar) %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% full_join(Totales,by=c("CC", "FinDe")) %>% 
   mutate(Distribucion=por_hora/Total) %>% 
   # Reordenar columnas para mostrarlas ordenadas
-  select(CC, Restaurante, FinDe, Lambda, Miu,  Distribucion, P_No_Cola, Por_Ocioso, T_Cola, T_Sistema_Prom, Max_T_Cola,
+  select(CC, Restaurante, FinDe, Lambda, Miu,  Distribucion, P_No_Cola, Por_Ocioso, T_Cola, T_Sistema_Prom, Max_T_Cola, En_Cola, En_Sistema,
          Sd_Miu, Min_T_Llegadas, Max_T_Llegadas, Inv_Miu, Inv_Lambda, Sd_Inv_Lambda, Cantidad, Tiempo_Tot)
 
 
@@ -158,8 +176,8 @@ Tabla_de_Probabilidades <- function(my_row) {
 # Crear Tabla con probabilidad de todos los restaurantes
 Probabilidades_de_N <- as_data_frame(t(apply(Caracteristicas ,1, Tabla_de_Probabilidades)))
 # Renombrar las columnas y convertirlas en numericas
-colnames(Probabilidades_de_N) <- c("CC", "Restaurante", "FinDe", 0:20)
-Probabilidades_de_N <- Probabilidades_de_N %>% mutate_at(3:23, as.numeric) %>% 
+colnames(Probabilidades_de_N) <- c("CC", "Restaurante", "FinDe", 0:10)
+Probabilidades_de_N <- Probabilidades_de_N %>% mutate_at(3:13, as.numeric) %>% 
   mutate_at("FinDe", as.factor)
 
 # Lo escribo a un archivo que puede ser utilizado despues
@@ -233,11 +251,4 @@ Simulaciones <- apply(datos_a_usar, 1, Generador_de_Cola, n=168)
 
 
 as_data_frame(Simulaciones[[19]]) %>% View()
-
-
-
-
-
-
-
 
