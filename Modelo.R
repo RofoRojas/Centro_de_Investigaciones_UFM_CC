@@ -89,7 +89,7 @@ datos_a_usar <- datos_iniciales %>%
             Min_T_Llegadas= min(Min_T_Llegadas), Max_T_Llegadas=max(Max_T_Llegadas), Max_T_Cola= max(Max_T_Cola),
             Inv_Lambda=sum(Inv_LambdaS)/sum(Cantidad), Sd_Inv_Lambda = sqrt(sum(Var_Inv_Lambda)),
             Inv_Miu = (sum(MiuS)/sum(Cantidad)),
-            T_Cola= sum(T_ColaS)/sum(Cantidad), T_Sistema_Prom = sum(T_Sistema_Prom)/sum(Cantidad),
+            T_Cola= sum(T_ColaS)/sum(Cantidad), T_Sistema_Prom = sum(T_Sistema_PromS)/sum(Cantidad),
             Tiempo_Tot=sum(Tiempo_Tot),
             # Caracteristicas de operación calculadas
             Total_Minutos= sum(Total_Minutos), Libre = sum(Libre), P_No_Cola= 1-sum(Hizo_Cola)/sum(Cantidad),
