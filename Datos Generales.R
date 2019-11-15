@@ -3,7 +3,7 @@ library(readxl)
 library(dplyr)
 library(lubridate)
 
-# Sirve solo para borrar todo el espacio de trabajo antes de crear variables
+# Solo para borrar todo el espacio de trabajo antes de crear variables
 rm(list = ls())
 
 ## Ingresar a todos los Centros Comerciales
@@ -13,7 +13,7 @@ for (folder in list.files("Data")) {
     ## Ingresar a todos los dias
     for (sheet in 1:length(excel_sheets(paste("Data", folder, archivo, sep = "/")))) {
       # Solo para poder ver que estoy sacando
-      print(paste("Leyendo: Data/", folder,'/', archivo,': hoja-',sheet, sep = ""))
+      print(paste("Leyendo: Data/", folder,'/', archivo,':sheet',sheet, sep = ""))
       
       # Importar tabla de datos
       temp_table <- read_excel(path = paste("Data", folder, archivo, sep = "/"), sheet = sheet, skip = 3,
@@ -82,7 +82,7 @@ datos_a_usar <- datos_iniciales %>%
   # S es utilizada para marcar la diferencia de las variables con pesos
   mutate(LambdaS=(Cantidad*Lambda), MiuS=(Cantidad*Miu), Var_Miu= (Sd_Miu^2), Inv_LambdaS=(Cantidad*Inv_Lambda), 
          Var_Inv_Lambda=(Sd_Inv_Lambda^2), En_ColaS= Cantidad*En_Cola, En_SistemaS= Cantidad*En_Sistema,
-         T_ColaS= Cantidad*T_Cola, T_Sistema_PromS= Cantidad*T_Sistema_Prom) %>% group_by(CC, Restaurante, FinDe) %>% 
+         T_ColaS= Cantidad*T_Cola, T_Sistema_PromS= Cantidad*T_Sistema_Prom) %>% group_by(CC, Restaurante) %>% 
   # Resumen de los datos relevantes por agrupacion establecida
   summarise(Cantidad = sum(Cantidad), Lambda= sum(LambdaS)/sum(Cantidad),
             Miu= 1/(sum(MiuS)/sum(Cantidad)), Sd_Miu=1/(sqrt(sum(Var_Miu))), 
@@ -97,17 +97,19 @@ datos_a_usar <- datos_iniciales %>%
   mutate(Por_Ocioso= Libre/Total_Minutos)
 
 # Para poder calcular la distribucion por cada centro comercial
-Totales <- datos_a_usar %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% group_by(CC, FinDe) %>% 
+Totales <- datos_a_usar %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% group_by(CC) %>% 
   summarise(Total=sum(por_hora))
 
-datos_a_usar<- as_data_frame(datos_a_usar) %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% full_join(Totales,by=c("CC", "FinDe")) %>% 
+datos_a_usar<- as_data_frame(datos_a_usar) %>% mutate(por_hora = Cantidad/Tiempo_Tot) %>% full_join(Totales,by=c("CC")) %>% 
   mutate(Distribucion=por_hora/Total) %>% 
   # Reordenar columnas para mostrarlas ordenadas
-  select(CC, Restaurante, FinDe, Lambda, Miu,  Distribucion, P_No_Cola, Por_Ocioso, T_Cola, T_Sistema_Prom, Max_T_Cola, En_Cola, En_Sistema,
+  select(CC, Restaurante, Lambda, Miu,  Distribucion, P_No_Cola, Por_Ocioso, T_Cola, T_Sistema_Prom, Max_T_Cola, En_Cola, En_Sistema,
          Sd_Miu, Min_T_Llegadas, Max_T_Llegadas, Inv_Miu, Inv_Lambda, Sd_Inv_Lambda, Cantidad, Tiempo_Tot)
 
+
+
 # Se escribe a un archivo donde se puede ver esta tabla a utilizar
-write.csv(datos_a_usar, file = "Resultados/Datos Finales.csv", row.names = FALSE)  
+write.csv(datos_a_usar, file = "Resultados/Datos Finales Sin Tipo de Día.csv", row.names = FALSE)  
 
 # Funcion para formatear las variables con duración en minutos y colocarlo en terminos comprensibles
 Formatear <- function(variable) {
@@ -120,7 +122,6 @@ Generador_de_Cola <- function(my_row, n=60) {
   # Extraer datos de la fila
   cc <- my_row["CC"]
   restaurante <- my_row["Restaurante"]
-  t_dia <-as.factor(my_row["FinDe"])
   miu <- as.numeric(my_row['Miu'])
   lambda <- as.numeric(my_row['Lambda'])
   
@@ -158,9 +159,9 @@ Generador_de_Cola <- function(my_row, n=60) {
   
   # Reformatear la tabla
   historia_restaurante <- historia_restaurante[(2:nrow(historia_restaurante)),]
-  historia_restaurante <- cbind(cc, restaurante, t_dia, historia_restaurante) 
+  historia_restaurante <- cbind(cc, restaurante, historia_restaurante) 
   
-  colnames(historia_restaurante) <- c("CC", "Restaurante", "FinDe","id", "Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema")
+  colnames(historia_restaurante) <- c("CC", "Restaurante","id", "Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema")
   historia_restaurante <- as_data_frame(historia_restaurante) 
   
   # Cambiar las variables de tiempo 
@@ -168,15 +169,13 @@ Generador_de_Cola <- function(my_row, n=60) {
     mutate_at(c("Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema"), as.numeric)
   historia_restaurante<- historia_restaurante %>%
     mutate_at(c("Entre_Llegadas", "Llegada", "Inicio", "Cola", "Servicio", "Final", "En_Sistema"), ~Formatear(.))
-
+  
   return(historia_restaurante)
 } 
 
 # Generar una lista con todas las simulaciones
-### El apply con Margin 1 significa que por cada fila del data frame correra la 
-###   función y se utiliza este n que es ingresado, en este caso son 12 horas.
-Simulaciones <- apply(datos_a_usar, MARGIN = 1, FUN = Generador_de_Cola, n=720)
+Simulaciones <- apply(datos_a_usar, 1, Generador_de_Cola, n=168)
 
-# Para Mostrar una  de las simulaciones de un restaurante
+
 as_data_frame(Simulaciones[[19]]) %>% View()
 

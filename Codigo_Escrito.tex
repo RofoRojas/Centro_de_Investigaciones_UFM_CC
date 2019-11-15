@@ -1,0 +1,548 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Restaurantes con Analisis de Colas},
+            pdfauthor={Centro de Investigaciones UFM},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Restaurantes con Analisis de Colas}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Centro de Investigaciones UFM}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{11/14/2019}
+
+
+\begin{document}
+\maketitle
+
+Importación de las librerias necesarias para poder correr el codigo
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(readxl)}
+\KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 3.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(lubridate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lubridate'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:base':
+## 
+##     date
+\end{verbatim}
+
+\hypertarget{funcion-para-formatear-variables-de-duracion}{%
+\section{Función para formatear variables de
+duración}\label{funcion-para-formatear-variables-de-duracion}}
+
+Con esta funcion podemos formatear las variables con duración en minutos
+y colocarlo en terminos comprensibles en medida que sea posible.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Formatear <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(variable) \{}
+\NormalTok{  nueva <-}\StringTok{ }\KeywordTok{period}\NormalTok{(}\DataTypeTok{hour=}\NormalTok{(variable}\OperatorTok{%/%}\DecValTok{60}\NormalTok{), }\DataTypeTok{minute=}\NormalTok{(variable}\OperatorTok{%%}\DecValTok{60}\OperatorTok{%/%}\DecValTok{1}\NormalTok{), }\DataTypeTok{second=}\NormalTok{((variable}\OperatorTok{%%}\DecValTok{1}\OperatorTok{*}\DecValTok{60}\NormalTok{)}\OperatorTok{%/%}\DecValTok{1}\NormalTok{))}
+  \KeywordTok{return}\NormalTok{(nueva)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{funcion-generador-de-cola}{%
+\section{Función Generador de Cola}\label{funcion-generador-de-cola}}
+
+La función Generador\_de\_Cola declarada a continuación, es necesario
+ingresar una fila o un vector de datos conteniendo los datos necesarios
+para generar una cola, además tambien se le ingresa la cantidad de
+minutos que se simularan, si no se ingresa una cantidad de minutos, por
+defecto se pasa una hora a la función si no hay ningún otro dato.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Generador_de_Cola <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(my_row, }\DataTypeTok{n=}\DecValTok{60}\NormalTok{) \{}
+  \CommentTok{# Extraer datos de la fila}
+\NormalTok{  cc <-}\StringTok{ }\NormalTok{my_row[}\StringTok{"CC"}\NormalTok{]}
+\NormalTok{  restaurante <-}\StringTok{ }\NormalTok{my_row[}\StringTok{"Restaurante"}\NormalTok{]}
+\NormalTok{  t_dia <-}\KeywordTok{as.factor}\NormalTok{(my_row[}\StringTok{"FinDe"}\NormalTok{])}
+\NormalTok{  miu <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(my_row[}\StringTok{'Miu'}\NormalTok{])}
+\NormalTok{  lambda <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(my_row[}\StringTok{'Lambda'}\NormalTok{])}
+  
+  \CommentTok{#Inicializacion de parametros}
+  \CommentTok{# Este vector consiste de }
+  \CommentTok{# Id|Tiempo Entre Llegadas|Llegadas|Servicio|Inicio|Tiempo en Cola|Tiempo en Servicio|Final|Tiempo en Sistema|}
+\NormalTok{  ultimo_cliente<-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{  historia_restaurante <-}\StringTok{ }\KeywordTok{c}\NormalTok{(ultimo_cliente)}
+  
+  \CommentTok{# Crear clientes por cada minuto de la simulación}
+\NormalTok{  clientes_por_minuto <-}\StringTok{ }\KeywordTok{rpois}\NormalTok{(n, lambda)}
+\NormalTok{  llegadas <-}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(clientes_por_minuto)) \{}
+    \CommentTok{# Se generan horas de llegadas de forma aleatoria entre cada minuto }
+\NormalTok{    horas <-}\StringTok{ }\KeywordTok{runif}\NormalTok{(clientes_por_minuto[j], j}\DecValTok{-1}\NormalTok{, j) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{round}\NormalTok{(}\DataTypeTok{digits=}\DecValTok{2}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{sort}\NormalTok{()}
+\NormalTok{    llegadas <-}\StringTok{ }\KeywordTok{c}\NormalTok{(llegadas,horas)}
+\NormalTok{  \}}
+  
+  \CommentTok{# Por cada llegada creada calculo el resto de los datos para completar la simulación, cliente por cliente}
+  \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(llegadas)) \{}
+    \CommentTok{# Calculos realizado}
+\NormalTok{    llegada <-}\StringTok{ }\NormalTok{llegadas[i]}
+\NormalTok{    e_llegadas <-}\StringTok{ }\NormalTok{llegada}\OperatorTok{-}\NormalTok{ultimo_cliente[}\DecValTok{3}\NormalTok{]}
+\NormalTok{    servicio <-}\StringTok{ }\KeywordTok{rexp}\NormalTok{(}\DataTypeTok{n =} \DecValTok{1}\NormalTok{, }\DataTypeTok{rate =}\NormalTok{ miu) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{round}\NormalTok{(}\DataTypeTok{digits=}\DecValTok{2}\NormalTok{)}
+\NormalTok{    inicio <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(llegada}\OperatorTok{>}\NormalTok{ultimo_cliente[}\DecValTok{7}\NormalTok{],llegada,ultimo_cliente[}\DecValTok{7}\NormalTok{])}
+\NormalTok{    cola <-}\StringTok{ }\NormalTok{(inicio}\OperatorTok{-}\NormalTok{llegada) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{round}\NormalTok{(}\DecValTok{2}\NormalTok{)}
+\NormalTok{    final <-}\StringTok{ }\NormalTok{inicio }\OperatorTok{+}\StringTok{ }\NormalTok{servicio}
+\NormalTok{    en_sistema <-}\StringTok{ }\NormalTok{final}\OperatorTok{-}\NormalTok{llegada}
+    
+    \CommentTok{# Reasigno las variables que van cambiando y agrego la fila a la historia}
+\NormalTok{    cliente_nuevo <-}\StringTok{ }\KeywordTok{c}\NormalTok{(i, e_llegadas, llegada, inicio, cola, servicio, final, en_sistema)}
+\NormalTok{    historia_restaurante <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(historia_restaurante, cliente_nuevo)}
+\NormalTok{    ultimo_cliente <-}\StringTok{ }\NormalTok{cliente_nuevo}
+\NormalTok{  \}}
+  
+  \CommentTok{# Reformatear la tabla}
+\NormalTok{  historia_restaurante <-}\StringTok{ }\NormalTok{historia_restaurante[(}\DecValTok{2}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(historia_restaurante)),]}
+\NormalTok{  historia_restaurante <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(cc, restaurante, t_dia, historia_restaurante) }
+  
+  \KeywordTok{colnames}\NormalTok{(historia_restaurante) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"CC"}\NormalTok{, }\StringTok{"Restaurante"}\NormalTok{, }\StringTok{"FinDe"}\NormalTok{,}\StringTok{"id"}\NormalTok{, }\StringTok{"Entre_Llegadas"}\NormalTok{, }\StringTok{"Llegada"}\NormalTok{, }\StringTok{"Inicio"}\NormalTok{, }\StringTok{"Cola"}\NormalTok{, }\StringTok{"Servicio"}\NormalTok{, }\StringTok{"Final"}\NormalTok{, }\StringTok{"En_Sistema"}\NormalTok{)}
+\NormalTok{  historia_restaurante <-}\StringTok{ }\KeywordTok{as_data_frame}\NormalTok{(historia_restaurante) }
+  
+  \CommentTok{# Cambiar las variables de tiempo }
+\NormalTok{  historia_restaurante<-}\StringTok{ }\NormalTok{historia_restaurante }\OperatorTok{%>%}
+\StringTok{    }\KeywordTok{mutate_at}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"Entre_Llegadas"}\NormalTok{, }\StringTok{"Llegada"}\NormalTok{, }\StringTok{"Inicio"}\NormalTok{, }\StringTok{"Cola"}\NormalTok{, }\StringTok{"Servicio"}\NormalTok{, }\StringTok{"Final"}\NormalTok{, }\StringTok{"En_Sistema"}\NormalTok{), as.numeric)}
+\NormalTok{  historia_restaurante<-}\StringTok{ }\NormalTok{historia_restaurante }\OperatorTok{%>%}
+\StringTok{    }\KeywordTok{mutate_at}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"Entre_Llegadas"}\NormalTok{, }\StringTok{"Llegada"}\NormalTok{, }\StringTok{"Inicio"}\NormalTok{, }\StringTok{"Cola"}\NormalTok{, }\StringTok{"Servicio"}\NormalTok{, }\StringTok{"Final"}\NormalTok{, }\StringTok{"En_Sistema"}\NormalTok{), }\OperatorTok{~}\KeywordTok{Formatear}\NormalTok{(.))}
+
+  \KeywordTok{return}\NormalTok{(historia_restaurante)}
+\NormalTok{\} }
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{lectura-y-manipulacion-de-datos}{%
+\section{Lectura y Manipulación de
+Datos}\label{lectura-y-manipulacion-de-datos}}
+
+Este chunk de código contiene tres ciclos anidados (uno dentro del
+otro), los cuales son utiles para la lectura de los archivos, no
+importando la cantidad de estos. Está estructurado para considerar las
+carpetas como centros comerciales, cada archivo debe estar en formato
+xlsx, incluir la palabra Datos al inicio y Seguido por el nombre del
+restaurante, sin caracteres especiales ni espacios.
+
+Además de leer los archivos con este codigo se crean columnas calculadas
+con los tiempos utiles y finalmente se crea una linea con los datos
+utiles (resumidos) por cada una de las hojas en todos los archivos. Cada
+una de estas filas se adjunta a una tabla llamada datos\_iniciales que
+almacenara todos los datos que más adelante serán utilizados. De este
+codigo unicamente se recibe una linea por cada una de las hojas de excel
+que es leida. Además se almacena la tabla completa de datos iniciales.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{## Ingresar a todos los Centros Comerciales}
+\ControlFlowTok{for}\NormalTok{ (folder }\ControlFlowTok{in} \KeywordTok{list.files}\NormalTok{(}\StringTok{"Data"}\NormalTok{)) \{}
+  \CommentTok{## Ingresar a todos los Restaurantes}
+  \ControlFlowTok{for}\NormalTok{ (archivo }\ControlFlowTok{in} \KeywordTok{list.files}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Data"}\NormalTok{, folder, }\DataTypeTok{sep =}\StringTok{"/"}\NormalTok{ ))) \{}
+    \CommentTok{## Ingresar a todos los dias}
+    \ControlFlowTok{for}\NormalTok{ (sheet }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(}\KeywordTok{excel_sheets}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Data"}\NormalTok{, folder, archivo, }\DataTypeTok{sep =} \StringTok{"/"}\NormalTok{)))) \{}
+      \CommentTok{# Solo para poder ver que estoy sacando}
+      \KeywordTok{print}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Leyendo: Data/"}\NormalTok{, folder,}\StringTok{'/'}\NormalTok{, archivo,}\StringTok{': hoja-'}\NormalTok{,sheet, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{))}
+      
+      \CommentTok{# Importar tabla de datos}
+\NormalTok{      temp_table <-}\StringTok{ }\KeywordTok{read_excel}\NormalTok{(}\DataTypeTok{path =} \KeywordTok{paste}\NormalTok{(}\StringTok{"Data"}\NormalTok{, folder, archivo, }\DataTypeTok{sep =} \StringTok{"/"}\NormalTok{), }\DataTypeTok{sheet =}\NormalTok{ sheet, }\DataTypeTok{skip =} \DecValTok{3}\NormalTok{,}
+                               \CommentTok{# Se coloca la esquina superior derecha se colocan los tipos de datos}
+                               \DataTypeTok{range =} \KeywordTok{cell_limits}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\OtherTok{NA}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DecValTok{4}\NormalTok{)),}\DataTypeTok{col_types =} \KeywordTok{c}\NormalTok{(}\StringTok{"numeric"}\NormalTok{, }\StringTok{"date"}\NormalTok{, }\StringTok{"date"}\NormalTok{, }\StringTok{"date"}\NormalTok{))}
+      \CommentTok{# Renombramos las columnas}
+      \KeywordTok{colnames}\NormalTok{(temp_table) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'Ingreso'}\NormalTok{, }\StringTok{'Llegada'}\NormalTok{, }\StringTok{'Inicio'}\NormalTok{, }\StringTok{'Final'}\NormalTok{)}
+      
+      \CommentTok{# Se dejan unicamente las filas completas pues el codigo anterior lee mas de las que existen y se laguean las llegadas}
+\NormalTok{      temp_table<-}\StringTok{ }\NormalTok{temp_table  }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(}\KeywordTok{complete.cases}\NormalTok{(temp_table)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Llegada_Anterior=} \KeywordTok{lag}\NormalTok{(Llegada,}\DecValTok{1}\NormalTok{), }\DataTypeTok{Final_Anterior=} \KeywordTok{lag}\NormalTok{(Final,}\DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\CommentTok{# Se estiman los diferentes tiempos que se tienen de la toma de datos que son relevantes para las colas.}
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{T_Llegadas=}\KeywordTok{as.duration}\NormalTok{(Llegada}\OperatorTok{-}\NormalTok{Llegada_Anterior), }\DataTypeTok{T_Cola=} \KeywordTok{as.duration}\NormalTok{(Inicio}\OperatorTok{-}\NormalTok{Llegada), }
+               \DataTypeTok{T_Servicio=}\KeywordTok{as.duration}\NormalTok{(Final}\OperatorTok{-}\NormalTok{Inicio), }\DataTypeTok{T_Sistema=} \KeywordTok{as.duration}\NormalTok{(Final}\OperatorTok{-}\NormalTok{Llegada),}
+               
+               \DataTypeTok{Libre=} \KeywordTok{as.duration}\NormalTok{(}\KeywordTok{ifelse}\NormalTok{(Llegada}\OperatorTok{>}\NormalTok{Final_Anterior, Final}\OperatorTok{-}\NormalTok{Llegada,}\DecValTok{0}\NormalTok{))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\CommentTok{# Transformar a minutos en el Tiempo de Cola se estiman 6 segundos para considerar las mala toma de datos}
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{T_Llegadas=}\NormalTok{T_Llegadas}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{), }\DataTypeTok{T_Cola=} \KeywordTok{ifelse}\NormalTok{(T_Cola}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{) }\OperatorTok{<}\StringTok{ }\FloatTok{0.1}\NormalTok{, }\DecValTok{0}\NormalTok{, T_Cola}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{)), }\DataTypeTok{T_Servicio=}\NormalTok{T_Servicio}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{), }\DataTypeTok{T_Sistema=}\NormalTok{ T_Sistema}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{),}
+               
+               \DataTypeTok{Libre=}\NormalTok{ Libre}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{), }\DataTypeTok{Hizo_Cola=}\KeywordTok{ifelse}\NormalTok{(T_Cola}\OperatorTok{!=}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+      \CommentTok{# Con estos ciclos, calculo cual es el promedio de personas en el sistema y el promedio de personas en Cola}
+\NormalTok{      En_Sistema<-}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{      En_Cola<-}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+      \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{2}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(temp_table)) \{}
+\NormalTok{        contador_s <-}\StringTok{ }\DecValTok{0}
+\NormalTok{        contador_c<-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(temp_table}\OperatorTok{$}\NormalTok{T_Cola[i]}\OperatorTok{>}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+        \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{(i}\DecValTok{-1}\NormalTok{)) \{}
+\NormalTok{          contador_s <-}\StringTok{ }\NormalTok{contador_s }\OperatorTok{+}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(temp_table}\OperatorTok{$}\NormalTok{Final[j]}\OperatorTok{>}\NormalTok{temp_table}\OperatorTok{$}\NormalTok{Llegada[i],}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{          contador_c <-}\StringTok{ }\NormalTok{contador_c }\OperatorTok{+}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(temp_table}\OperatorTok{$}\NormalTok{Inicio[j]}\OperatorTok{>}\NormalTok{temp_table}\OperatorTok{$}\NormalTok{Llegada[i],}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\NormalTok{        \}}
+\NormalTok{        En_Sistema<-}\StringTok{ }\KeywordTok{c}\NormalTok{(En_Sistema, contador_s)}
+\NormalTok{        En_Cola<-}\StringTok{ }\KeywordTok{c}\NormalTok{(En_Cola, contador_c)}
+\NormalTok{      \}}
+\NormalTok{      temp_table}\OperatorTok{$}\NormalTok{En_Sistema<-}\StringTok{ }\NormalTok{En_Sistema}
+\NormalTok{      temp_table}\OperatorTok{$}\NormalTok{En_Cola <-}\StringTok{ }\NormalTok{En_Cola}
+      
+      
+      \CommentTok{# Se obtienen los datos mas relevantes de cada archivo y se resumen en esta tabla}
+\NormalTok{      datos_utiles <-}\StringTok{ }\NormalTok{temp_table  }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{CC=}\NormalTok{ folder, }\DataTypeTok{Restaurante=} \KeywordTok{substr}\NormalTok{(archivo, }\DecValTok{6}\NormalTok{, }\KeywordTok{nchar}\NormalTok{(archivo)}\OperatorTok{-}\DecValTok{5}\NormalTok{), }\DataTypeTok{Fecha=} \KeywordTok{date}\NormalTok{(Llegada[}\DecValTok{1}\NormalTok{]),}\DataTypeTok{Cantidad=} \KeywordTok{n}\NormalTok{(),}
+                  \DataTypeTok{Intervalo=}\NormalTok{ (Llegada[}\DecValTok{1}\NormalTok{]}\OperatorTok{%--%}\NormalTok{Llegada[}\KeywordTok{nrow}\NormalTok{(temp_table)]), }\DataTypeTok{Intervalo2=}\NormalTok{ (Llegada[}\DecValTok{1}\NormalTok{]}\OperatorTok{%--%}\NormalTok{Final[}\KeywordTok{nrow}\NormalTok{(temp_table)]),}
+                  \CommentTok{# Datos para poder realizar simulacion}
+                  \DataTypeTok{Inv_Lambda=} \KeywordTok{mean}\NormalTok{(T_Llegadas, }\DataTypeTok{na.rm =}\NormalTok{ T), }\DataTypeTok{Sd_Inv_Lambda =} \KeywordTok{sd}\NormalTok{(T_Llegadas, }\DataTypeTok{na.rm=}\NormalTok{T) , }\DataTypeTok{Miu=} \KeywordTok{mean}\NormalTok{(T_Servicio), }\DataTypeTok{Sd_Miu=} \KeywordTok{sd}\NormalTok{(T_Servicio),}
+                  \DataTypeTok{Min_T_Llegadas=}\KeywordTok{min}\NormalTok{(T_Llegadas, }\DataTypeTok{na.rm =}\NormalTok{ T), }\DataTypeTok{Max_T_Llegadas=} \KeywordTok{max}\NormalTok{(T_Llegadas, }\DataTypeTok{na.rm =}\NormalTok{ T), }\DataTypeTok{Max_T_Cola=} \KeywordTok{max}\NormalTok{(T_Cola, }\DataTypeTok{na.rm =}\NormalTok{ T),}
+                  \CommentTok{# Promedios de tiempos calculados}
+                  \DataTypeTok{T_Cola=} \KeywordTok{mean}\NormalTok{(T_Cola), }\DataTypeTok{T_Sistema_Prom=}\KeywordTok{mean}\NormalTok{(T_Sistema),}
+                  \DataTypeTok{T_Sistema_Total=} \KeywordTok{sum}\NormalTok{(T_Sistema), }\DataTypeTok{Libre=}\KeywordTok{sum}\NormalTok{(Libre, }\DataTypeTok{na.rm =}\NormalTok{ T), }\DataTypeTok{Hizo_Cola=} \KeywordTok{sum}\NormalTok{(Hizo_Cola),}
+                  \DataTypeTok{En_Cola=} \KeywordTok{mean}\NormalTok{(En_Cola), }\DataTypeTok{En_Sistema=} \KeywordTok{mean}\NormalTok{(En_Sistema)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{D_Semana=}\KeywordTok{wday}\NormalTok{(Fecha,}\DataTypeTok{week_start =} \DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FinDe =} \KeywordTok{ifelse}\NormalTok{(D_Semana}\OperatorTok{>=}\DecValTok{6}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Tiempo_Tot=} \KeywordTok{as.duration}\NormalTok{(Intervalo)}\OperatorTok{/}\KeywordTok{dhours}\NormalTok{(}\DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Lambda=}\NormalTok{ Cantidad}\OperatorTok{/}\NormalTok{(Tiempo_Tot}\OperatorTok{*}\DecValTok{60}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Total_Minutos=} \KeywordTok{as.duration}\NormalTok{(Intervalo2)}\OperatorTok{/}\KeywordTok{dminutes}\NormalTok{(}\DecValTok{1}\NormalTok{)) }
+      
+      \CommentTok{# Si no existe crear tabla datos_iniciales}
+      \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{exists}\NormalTok{(}\StringTok{"datos_iniciales"}\NormalTok{)) \{}
+\NormalTok{        datos_iniciales <-}\KeywordTok{rbind}\NormalTok{(datos_iniciales, datos_utiles)}
+\NormalTok{      \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{        datos_iniciales <-}\StringTok{ }\NormalTok{datos_utiles}
+\NormalTok{      \}}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Leyendo: Data/La Pradera/DatosBurgerKing.xlsx: hoja-1"
+## [1] "Leyendo: Data/La Pradera/DatosBurgerKing.xlsx: hoja-2"
+## [1] "Leyendo: Data/La Pradera/DatosBurgerKing.xlsx: hoja-3"
+## [1] "Leyendo: Data/La Pradera/DatosBurgerKing.xlsx: hoja-4"
+## [1] "Leyendo: Data/La Pradera/DatosGoGreen.xlsx: hoja-1"
+## [1] "Leyendo: Data/La Pradera/DatosGoGreen.xlsx: hoja-2"
+## [1] "Leyendo: Data/La Pradera/DatosGoGreen.xlsx: hoja-3"
+## [1] "Leyendo: Data/La Pradera/DatosPandaExpress.xlsx: hoja-1"
+## [1] "Leyendo: Data/La Pradera/DatosPandaExpress.xlsx: hoja-2"
+## [1] "Leyendo: Data/La Pradera/DatosPandaExpress.xlsx: hoja-3"
+## [1] "Leyendo: Data/La Pradera/DatosPolloCampero.xlsx: hoja-1"
+## [1] "Leyendo: Data/La Pradera/DatosPolloCampero.xlsx: hoja-2"
+## [1] "Leyendo: Data/La Pradera/DatosPolloCampero.xlsx: hoja-3"
+## [1] "Leyendo: Data/La Pradera/DatosSubway.xlsx: hoja-1"
+## [1] "Leyendo: Data/La Pradera/DatosSubway.xlsx: hoja-2"
+## [1] "Leyendo: Data/La Pradera/DatosSubway.xlsx: hoja-3"
+## [1] "Leyendo: Data/La Pradera/DatosSubway.xlsx: hoja-4"
+## [1] "Leyendo: Data/La Pradera/DatosTacoBell.xlsx: hoja-1"
+## [1] "Leyendo: Data/La Pradera/DatosTacoBell.xlsx: hoja-2"
+## [1] "Leyendo: Data/La Pradera/DatosTacoBell.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosBurgerKing.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosBurgerKing.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosBurgerKing.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosGoGreen.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosGoGreen.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosGoGreen.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosKFC.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosKFC.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosKFC.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosMcDonalds.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosMcDonalds.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosMcDonalds.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosPolloCampero.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosPolloCampero.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosPolloCampero.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosPolloCampero.xlsx: hoja-4"
+## [1] "Leyendo: Data/Miraflores/DatosSubway.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosSubway.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosSubway.xlsx: hoja-3"
+## [1] "Leyendo: Data/Miraflores/DatosTacoBell.xlsx: hoja-1"
+## [1] "Leyendo: Data/Miraflores/DatosTacoBell.xlsx: hoja-2"
+## [1] "Leyendo: Data/Miraflores/DatosTacoBell.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosBurgerKing.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosBurgerKing.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosBurgerKing.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosGoGreen.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosGoGreen.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosGoGreen.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosMcDonalds.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosMcDonalds.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosMcDonalds.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosPandaExpress.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosPandaExpress.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosPandaExpress.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosPolloCampero.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosPolloCampero.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosPolloCampero.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosSubway.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosSubway.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosSubway.xlsx: hoja-3"
+## [1] "Leyendo: Data/Pradera Concepción/DatosTacoBell.xlsx: hoja-1"
+## [1] "Leyendo: Data/Pradera Concepción/DatosTacoBell.xlsx: hoja-2"
+## [1] "Leyendo: Data/Pradera Concepción/DatosTacoBell.xlsx: hoja-3"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{datos_a_usar <-}\StringTok{ }\NormalTok{datos_iniciales }\OperatorTok{%>%}
+\StringTok{  }\CommentTok{# S es utilizada para marcar la diferencia de las variables con pesos}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{LambdaS=}\NormalTok{(Cantidad}\OperatorTok{*}\NormalTok{Lambda), }\DataTypeTok{MiuS=}\NormalTok{(Cantidad}\OperatorTok{*}\NormalTok{Miu), }\DataTypeTok{Var_Miu=}\NormalTok{ (Sd_Miu}\OperatorTok{^}\DecValTok{2}\NormalTok{), }\DataTypeTok{Inv_LambdaS=}\NormalTok{(Cantidad}\OperatorTok{*}\NormalTok{Inv_Lambda), }
+         \DataTypeTok{Var_Inv_Lambda=}\NormalTok{(Sd_Inv_Lambda}\OperatorTok{^}\DecValTok{2}\NormalTok{), }\DataTypeTok{En_ColaS=}\NormalTok{ Cantidad}\OperatorTok{*}\NormalTok{En_Cola, }\DataTypeTok{En_SistemaS=}\NormalTok{ Cantidad}\OperatorTok{*}\NormalTok{En_Sistema,}
+         \DataTypeTok{T_ColaS=}\NormalTok{ Cantidad}\OperatorTok{*}\NormalTok{T_Cola, }\DataTypeTok{T_Sistema_PromS=}\NormalTok{ Cantidad}\OperatorTok{*}\NormalTok{T_Sistema_Prom) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{group_by}\NormalTok{(CC, Restaurante, FinDe) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\CommentTok{# Resumen de los datos relevantes por agrupacion establecida}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Cantidad =} \KeywordTok{sum}\NormalTok{(Cantidad), }\DataTypeTok{Lambda=} \KeywordTok{sum}\NormalTok{(LambdaS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad),}
+            \DataTypeTok{Miu=} \DecValTok{1}\OperatorTok{/}\NormalTok{(}\KeywordTok{sum}\NormalTok{(MiuS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad)), }\DataTypeTok{Sd_Miu=}\DecValTok{1}\OperatorTok{/}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{sum}\NormalTok{(Var_Miu))), }
+            \DataTypeTok{Min_T_Llegadas=} \KeywordTok{min}\NormalTok{(Min_T_Llegadas), }\DataTypeTok{Max_T_Llegadas=}\KeywordTok{max}\NormalTok{(Max_T_Llegadas), }\DataTypeTok{Max_T_Cola=} \KeywordTok{max}\NormalTok{(Max_T_Cola),}
+            \DataTypeTok{Inv_Lambda=}\KeywordTok{sum}\NormalTok{(Inv_LambdaS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad), }\DataTypeTok{Sd_Inv_Lambda =} \KeywordTok{sqrt}\NormalTok{(}\KeywordTok{sum}\NormalTok{(Var_Inv_Lambda)),}
+            \DataTypeTok{Inv_Miu =}\NormalTok{ (}\KeywordTok{sum}\NormalTok{(MiuS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad)),}
+            \DataTypeTok{T_Cola=} \KeywordTok{sum}\NormalTok{(T_ColaS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad), }\DataTypeTok{T_Sistema_Prom =} \KeywordTok{sum}\NormalTok{(T_Sistema_PromS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad),}
+            \DataTypeTok{Tiempo_Tot=}\KeywordTok{sum}\NormalTok{(Tiempo_Tot),}
+            \CommentTok{# Caracteristicas de operación calculadas}
+            \DataTypeTok{Total_Minutos=} \KeywordTok{sum}\NormalTok{(Total_Minutos), }\DataTypeTok{Libre =} \KeywordTok{sum}\NormalTok{(Libre), }\DataTypeTok{P_No_Cola=} \DecValTok{1}\OperatorTok{-}\KeywordTok{sum}\NormalTok{(Hizo_Cola)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad),}
+            \DataTypeTok{En_Cola=}\KeywordTok{sum}\NormalTok{(En_ColaS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad), }\DataTypeTok{En_Sistema=}\KeywordTok{sum}\NormalTok{(En_SistemaS)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Cantidad)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Por_Ocioso=}\NormalTok{ Libre}\OperatorTok{/}\NormalTok{Total_Minutos)}
+
+\CommentTok{# Para poder calcular la distribucion por cada centro comercial}
+\NormalTok{Totales <-}\StringTok{ }\NormalTok{datos_a_usar }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{por_hora =}\NormalTok{ Cantidad}\OperatorTok{/}\NormalTok{Tiempo_Tot) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{group_by}\NormalTok{(CC, FinDe) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Total=}\KeywordTok{sum}\NormalTok{(por_hora))}
+
+\NormalTok{datos_a_usar<-}\StringTok{ }\KeywordTok{as_data_frame}\NormalTok{(datos_a_usar) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{por_hora =}\NormalTok{ Cantidad}\OperatorTok{/}\NormalTok{Tiempo_Tot) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{full_join}\NormalTok{(Totales,}\DataTypeTok{by=}\KeywordTok{c}\NormalTok{(}\StringTok{"CC"}\NormalTok{, }\StringTok{"FinDe"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Distribucion=}\NormalTok{por_hora}\OperatorTok{/}\NormalTok{Total) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\CommentTok{# Reordenar columnas para mostrarlas ordenadas}
+\StringTok{  }\KeywordTok{select}\NormalTok{(CC, Restaurante, FinDe, Lambda, Miu,  Distribucion, P_No_Cola, Por_Ocioso, T_Cola, T_Sistema_Prom, Max_T_Cola, En_Cola, En_Sistema, Sd_Miu, Min_T_Llegadas, Max_T_Llegadas, Inv_Miu, Inv_Lambda, Sd_Inv_Lambda, Cantidad, Tiempo_Tot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: `as_data_frame()` is deprecated, use `as_tibble()` (but mind the new semantics).
+## This warning is displayed once per session.
+\end{verbatim}
+
+\hypertarget{escribir-archivo}{%
+\section{Escribir Archivo}\label{escribir-archivo}}
+
+Esta linea de codigo hace que la tabla se cree y escribe un archivo csv
+con estos datos. Para la visualizacion de este Markdown se mostró las
+primeras filas de esta tabla
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Se escribe a un archivo donde se puede ver esta tabla a utilizar}
+\KeywordTok{write.csv}\NormalTok{(datos_a_usar, }\DataTypeTok{file =} \StringTok{"Resultados/Datos Finales.csv"}\NormalTok{, }\DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{)  }
+\NormalTok{datos_a_usar[}\DecValTok{1}\OperatorTok{:}\DecValTok{13}\NormalTok{] }\OperatorTok{%>%}\StringTok{ }\KeywordTok{head}\NormalTok{(}\DecValTok{15}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 15 x 13
+##    CC    Restaurante FinDe Lambda   Miu Distribucion P_No_Cola Por_Ocioso
+##    <chr> <chr>       <dbl>  <dbl> <dbl>        <dbl>     <dbl>      <dbl>
+##  1 La P~ BurgerKing      0  0.772 0.419       0.133     0.351    0.226   
+##  2 La P~ BurgerKing      1  0.470 0.393       0.121     0.509    0.318   
+##  3 La P~ GoGreen         0  0.472 0.257       0.0788    0.510    0.123   
+##  4 La P~ GoGreen         1  0.176 0.208       0.0451    0.812    0.00582 
+##  5 La P~ PandaExpre~     0  1.80  0.234       0.317     0.183    0       
+##  6 La P~ PandaExpre~     1  0.805 0.237       0.206     0.0536   0.00204 
+##  7 La P~ PolloCampe~     0  1.11  0.265       0.170     0.252    0.0599  
+##  8 La P~ PolloCampe~     1  1.40  0.382       0.359     0.273    0.167   
+##  9 La P~ Subway          0  0.715 0.277       0.125     0.0571   0.000568
+## 10 La P~ Subway          1  0.508 0.222       0.122     0.211    0.0690  
+## 11 La P~ TacoBell        0  1.00  0.292       0.176     0.128    0.0630  
+## 12 La P~ TacoBell        1  0.573 0.231       0.147     0.344    0.00143 
+## 13 Mira~ BurgerKing      0  0.284 0.328       0.0885    0.782    0.250   
+## 14 Mira~ BurgerKing      1  0.766 0.533       0.159     0.242    0.312   
+## 15 Mira~ GoGreen         0  0.230 0.158       0.0737    0.464    0.00287 
+## # ... with 5 more variables: T_Cola <dbl>, T_Sistema_Prom <dbl>,
+## #   Max_T_Cola <dbl>, En_Cola <dbl>, En_Sistema <dbl>
+\end{verbatim}
+
+\hypertarget{generar-una-lista-con-todas-las-simulaciones}{%
+\section{Generar una lista con todas las
+simulaciones}\label{generar-una-lista-con-todas-las-simulaciones}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{### El apply con Margin 1 significa que por cada fila del data frame correra la }
+\CommentTok{###   función y se utiliza este n que es ingresado, en este caso son 12 horas.}
+\NormalTok{Simulaciones <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(datos_a_usar, }\DataTypeTok{MARGIN =} \DecValTok{1}\NormalTok{, }\DataTypeTok{FUN =}\NormalTok{ Generador_de_Cola, }\DataTypeTok{n=}\DecValTok{720}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: `as_data_frame()` is deprecated, use `as_tibble()` (but mind the new semantics).
+## This warning is displayed once per session.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{as_data_frame}\NormalTok{(Simulaciones[[}\DecValTok{1}\NormalTok{]]) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{head}\NormalTok{(}\DecValTok{20}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 20 x 11
+##    CC    Restaurante FinDe id    Entre_Llegadas Llegada Inicio  Cola   
+##    <chr> <chr>       <chr> <chr> <Period>       <Perio> <Perio> <Perio>
+##  1 La P~ BurgerKing  1     1     1M 1S          1M 1S   1M 1S   0S     
+##  2 La P~ BurgerKing  1     2     1M 46S         2M 47S  2M 47S  0S     
+##  3 La P~ BurgerKing  1     3     33S            3M 21S  3M 56S  34S    
+##  4 La P~ BurgerKing  1     4     1M 51S         5M 12S  5M 12S  0S     
+##  5 La P~ BurgerKing  1     5     3M 27S         8M 40S  9M 2S   22S    
+##  6 La P~ BurgerKing  1     6     28S            9M 8S   9M 46S  38S    
+##  7 La P~ BurgerKing  1     7     3M 24S         12M 33S 12M 33S 0S     
+##  8 La P~ BurgerKing  1     8     23S            12M 56S 18M 14S 5M 17S 
+##  9 La P~ BurgerKing  1     9     1M 4S          14M 0S  19M 7S  5M 7S  
+## 10 La P~ BurgerKing  1     10    39S            14M 40S 21M 58S 7M 18S 
+## 11 La P~ BurgerKing  1     11    1M 49S         16M 30S 25M 49S 9M 19S 
+## 12 La P~ BurgerKing  1     12    40S            17M 10S 26M 37S 9M 27S 
+## 13 La P~ BurgerKing  1     13    2M 29S         19M 39S 32M 0S  12M 20S
+## 14 La P~ BurgerKing  1     14    42S            20M 22S 32M 27S 12M 5S 
+## 15 La P~ BurgerKing  1     15    3S             20M 25S 36M 2S  15M 37S
+## 16 La P~ BurgerKing  1     16    1S             20M 26S 36M 57S 16M 30S
+## 17 La P~ BurgerKing  1     17    0S             20M 27S 37M 21S 16M 53S
+## 18 La P~ BurgerKing  1     18    2M 16S         22M 43S 37M 46S 15M 3S 
+## 19 La P~ BurgerKing  1     19    12S            22M 56S 44M 43S 21M 47S
+## 20 La P~ BurgerKing  1     20    34S            23M 30S 47M 3S  23M 33S
+## # ... with 3 more variables: Servicio <Period>, Final <Period>,
+## #   En_Sistema <Period>
+\end{verbatim}
+
+
+\end{document}
