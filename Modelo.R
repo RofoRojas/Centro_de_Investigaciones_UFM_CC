@@ -6,6 +6,7 @@ library(lubridate)
 # Sirve solo para borrar todo el espacio de trabajo antes de crear variables
 rm(list = ls())
 
+
 ## Ingresar a todos los Centros Comerciales
 for (folder in list.files("Data")) {
   ## Ingresar a todos los Restaurantes
@@ -66,6 +67,10 @@ for (folder in list.files("Data")) {
         mutate(Lambda= Cantidad/(Tiempo_Tot*60)) %>% 
         mutate(Total_Minutos= as.duration(Intervalo2)/dminutes(1)) 
       
+      # hist(temp_table$T_Llegadas, main = paste(folder, substr(archivo, 6, nchar(archivo)-5),sheet, sep=" "), xlab = "Tiempo Entre Llegadas")
+      # hist(temp_table$T_Servicio, main = paste(folder, substr(archivo, 6, nchar(archivo)-5),sheet, sep=" "), xlab = "Tiempo de Servicios")
+      # boxplot(temp_table$T_Servicio, main= paste('Tiempo de Servicio', folder, substr(archivo, 6, nchar(archivo)-5), sep=" ") )
+      
       # Si no existe crear tabla datos_iniciales
       if (exists("datos_iniciales")) {
         datos_iniciales <-rbind(datos_iniciales, datos_utiles)
@@ -75,6 +80,7 @@ for (folder in list.files("Data")) {
     }
   }
 }
+
 
 
 
